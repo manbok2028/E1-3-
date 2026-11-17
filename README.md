@@ -1,6 +1,6 @@
 # Mini NPU Simulator — MAC 패턴 판별기
 
-3×3부터 25×25까지의 숫자 배열을 직접 곱하고 더해(CAC가 아니라 **MAC**, Multiply-Accumulate) Cross와 X 패턴의 유사도를 판별하는 표준 라이브러리 전용 Python 콘솔 프로그램입니다.
+3×3부터 25×25까지의 숫자 배열을 직접 곱하고 더해(**MAC**, Multiply-Accumulate) Cross와 X 패턴의 유사도를 판별하는 표준 라이브러리 전용 Python 콘솔 프로그램입니다.
 
 ## 1. 미션 목표를 쉬운 말로 정리
 
