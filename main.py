@@ -62,6 +62,7 @@ def run_manual_mode() -> None:
     print("\n=== 사용자 입력 모드 (3×3) ===")
     filter_a = read_matrix(3, "필터 A")
     filter_b = read_matrix(3, "필터 B")
+    print("필터 A와 필터 B를 저장했습니다.")
     pattern = read_matrix(3, "패턴")
 
     score_a = mac_score(pattern, filter_a)
