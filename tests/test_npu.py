@@ -21,6 +21,7 @@ from npu import (  # noqa: E402
     normalize_label,
     validate_square_matrix,
 )
+from tax_calculator import TaxBracket, calculate_learning_tax  # noqa: E402
 
 
 class MiniNpuTest(unittest.TestCase):
@@ -102,6 +103,18 @@ class MiniNpuTest(unittest.TestCase):
         result = analyze_data(data)[0]
         self.assertFalse(result.passed)
         self.assertIn("X 필터", result.reason)
+
+    def test_learning_progressive_tax_breakdown(self):
+        calculation = calculate_learning_tax(50_000_000, 0)
+        self.assertEqual(calculation.taxable_base, 50_000_000)
+        self.assertEqual(calculation.estimated_tax, 6_500_000)
+        self.assertAlmostEqual(calculation.effective_rate, 0.13)
+
+    def test_learning_tax_rejects_invalid_input_and_bad_brackets(self):
+        with self.assertRaises(ValueError):
+            calculate_learning_tax(-1, 0)
+        with self.assertRaises(ValueError):
+            calculate_learning_tax(1, 0, (TaxBracket(None, 0.1), TaxBracket(2, 0.2)))
 
 
 if __name__ == "__main__":
