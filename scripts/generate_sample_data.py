@@ -8,20 +8,21 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Dict, List
 
 
-def cross(size: int) -> list[list[int]]:
+def cross(size: int) -> List[List[int]]:
     middle = size // 2
     return [[1 if row == middle or column == middle else 0 for column in range(size)] for row in range(size)]
 
 
-def x_shape(size: int) -> list[list[int]]:
+def x_shape(size: int) -> List[List[int]]:
     return [[1 if row == column or row + column == size - 1 else 0 for column in range(size)] for row in range(size)]
 
 
 def main() -> None:
-    filters: dict[str, dict[str, list[list[int]]]] = {}
-    patterns: dict[str, dict[str, object]] = {}
+    filters: Dict[str, Dict[str, List[List[int]]]] = {}
+    patterns: Dict[str, Dict[str, object]] = {}
     for size in (5, 13, 25):
         cross_filter = cross(size)
         x_filter = x_shape(size)
