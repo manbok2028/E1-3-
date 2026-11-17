@@ -20,6 +20,7 @@ from npu import (
     measure_mac_flat,
     performance_rows,
 )
+from tax_calculator import LEARNING_BRACKETS, calculate_learning_tax
 
 
 DATA_PATH = Path(__file__).with_name("data.json")
@@ -142,6 +143,49 @@ def run_bonus_mode() -> None:
     print("두 점수가 같은지: {}".format("예" if abs(score_matrix - score_flat) < EPSILON else "아니오"))
 
 
+def _read_nonnegative_amount(label: str) -> float:
+    """Read one won amount without accepting a negative or non-numeric value."""
+
+    while True:
+        raw = input("{}(원): ".format(label)).strip().replace(",", "")
+        try:
+            amount = float(raw)
+            if amount < 0:
+                raise ValueError
+            return amount
+        except ValueError:
+            print("입력 오류: 0 이상의 숫자만 입력하세요. 쉼표는 넣어도 됩니다.")
+
+
+def _format_won(amount: float) -> str:
+    return "{:,}원".format(round(amount))
+
+
+def run_tax_learning_mode() -> None:
+    """Run a safe, clearly labelled tax-calculation learning exercise."""
+
+    print("\n=== 학습용 누진세 계산기 ===")
+    print("주의: 아래 세율은 계산 원리를 배우기 위한 예시입니다.")
+    print("실제 세금 신고·납부 금액을 판단하는 용도로 사용하면 안 됩니다.")
+    gross_income = _read_nonnegative_amount("연간 총소득")
+    deductions = _read_nonnegative_amount("단순 공제액")
+    calculation = calculate_learning_tax(gross_income, deductions)
+
+    print("\n[계산 흐름]")
+    print("총소득: {}".format(_format_won(calculation.gross_income)))
+    print("단순 공제액: {}".format(_format_won(calculation.deductions)))
+    print("과세표준(학습용): {}".format(_format_won(calculation.taxable_base)))
+    print("\n[예시 세율 구간별 계산]")
+    for line in calculation.lines:
+        upper = "초과분" if line.upper_limit is None else "{} 이하".format(_format_won(line.upper_limit))
+        print("- {} ~ {}: {} × {:.0%} = {}".format(
+            _format_won(line.lower_limit), upper, _format_won(line.taxable_amount), line.rate, _format_won(line.tax)
+        ))
+    print("\n학습용 추정 세액: {}".format(_format_won(calculation.estimated_tax)))
+    print("총소득 대비 비율: {:.2%}".format(calculation.effective_rate))
+    print("다시 안내: 실제 세금은 소득 종류·공제 요건·세법 개정 등에 따라 달라집니다.")
+
+
 def main() -> None:
     print("=== Mini NPU Simulator ===")
     while True:
@@ -149,6 +193,7 @@ def main() -> None:
         print("1. 사용자 입력 (3×3)")
         print("2. data.json 분석")
         print("3. 보너스: 패턴 생성/1차원 MAC 비교")
+        print("4. 확장: 학습용 누진세 계산")
         print("0. 종료")
         try:
             choice = input("선택: ").strip()
@@ -162,11 +207,13 @@ def main() -> None:
             run_json_mode()
         elif choice == "3":
             run_bonus_mode()
+        elif choice == "4":
+            run_tax_learning_mode()
         elif choice == "0":
             print("Mini NPU Simulator를 종료합니다.")
             return
         else:
-            print("메뉴 오류: 0, 1, 2, 3 중 하나를 입력하세요.")
+            print("메뉴 오류: 0, 1, 2, 3, 4 중 하나를 입력하세요.")
 
 
 if __name__ == "__main__":
